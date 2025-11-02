@@ -17,7 +17,7 @@ export default function RichTextEditor({
   onChange,
   placeholder = "Start writing...",
 }: RichTextEditorProps) {
-  const editor = useEditor<any>({
+  const editor = useEditor({
     extensions: [
       StarterKit.configure({
         heading: {
