@@ -22,6 +22,7 @@ import RichTextEditor from "@/components/RichTextEditor";
 import { formatTimestamp, getFullDateTime } from "@/utils/formatTime";
 import { extractTitle } from "@/utils/extractTitle";
 import { debounce } from "@/utils/debounce";
+import PresenceIndicator from "@/components/PresenceIndicator";
 
 export default function NoteEditorPage() {
   const router = useRouter();
@@ -112,11 +113,14 @@ export default function NoteEditorPage() {
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <Button variant="light" onPress={() => router.push("/")}>
-            ← Back to Notes
-          </Button>
-          <div className="flex gap-2">
+        <div className="mb-6 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Button variant="light" onPress={() => router.push("/")}>
+              ← Back to Notes
+            </Button>
+            <PresenceIndicator noteId={noteId} />
+          </div>
+          <div className="flex flex-wrap gap-2">
             <Button variant="light" onPress={onOpen}>
               History
               {versions.length > 0 && (
@@ -124,6 +128,12 @@ export default function NoteEditorPage() {
                   {versions.length}
                 </span>
               )}
+            </Button>
+            <Button variant="light" onPress={() => exportMarkdown(title, content)}>
+              Export .md
+            </Button>
+            <Button variant="light" onPress={() => exportPDF(title, content)}>
+              Export PDF
             </Button>
             <Button color="danger" variant="light" onPress={handleDelete} isLoading={isDeleting}>
               Delete
@@ -217,3 +227,64 @@ export default function NoteEditorPage() {
   );
 }
 
+
+// --- Export helpers (module scope) ---
+function htmlToMarkdown(html: string): string {
+  let s = html || "";
+  s = s.replace(/\n/g, "");
+  s = s.replace(/<h1[^>]*>(.*?)<\/h1>/gi, "# $1\n\n");
+  s = s.replace(/<h2[^>]*>(.*?)<\/h2>/gi, "## $1\n\n");
+  s = s.replace(/<h3[^>]*>(.*?)<\/h3>/gi, "### $1\n\n");
+  s = s.replace(/<strong>|<b>/gi, "**").replace(/<\/strong>|<\/b>/gi, "**");
+  s = s.replace(/<em>|<i>/gi, "*").replace(/<\/em>|<\/i>/gi, "*");
+  s = s.replace(/<pre[^>]*><code[^>]*>([\s\S]*?)<\/code><\/pre>/gi, (m, p1) => `\n\n\
+\`\`\`\n${p1}\n\`\`\`\n\n`);
+  s = s.replace(/<code>(.*?)<\/code>/gi, "`$1`");
+  s = s.replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, (m, p1) => p1.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, "- $1\n") + "\n");
+  s = s.replace(/<ol[^>]*>([\s\S]*?)<\/ol>/gi, (m, p1) => {
+    let i = 1;
+    return p1.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, (_, item) => `${i++}. ${item}\n`) + "\n";
+  });
+  s = s.replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi, (m, p1) => p1.split(/\n/).map((l: string) => "> " + l).join("\n") + "\n\n");
+  s = s.replace(/<br\s*\/?>(\s*)/gi, "\n");
+  s = s.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, "$1\n\n");
+  s = s.replace(/<[^>]+>/g, "");
+  return s.trim() + "\n";
+}
+
+function downloadFile(filename: string, content: string, type = "text/plain") {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function exportMarkdown(title: string, html: string) {
+  const md = htmlToMarkdown(html);
+  const safe = (title || "note").replace(/[^a-z0-9\-]+/gi, "-").toLowerCase();
+  downloadFile(`${safe || "note"}.md`, md, "text/markdown");
+}
+
+function exportPDF(title: string, html: string) {
+  const win = window.open("", "_blank");
+  if (!win) return;
+  const doc = win.document;
+  doc.write(`<!doctype html><html><head><meta charset='utf-8'><title>${title || "Note"}</title>
+  <style>
+    body{font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding:32px; color:#111}
+    h1,h2,h3{margin:16px 0 8px}
+    .content{max-width:800px;margin:0 auto}
+    pre{background:#f5f5f5;padding:12px;border-radius:8px;overflow:auto}
+    code{background:#f0f0f0;padding:2px 4px;border-radius:4px}
+  </style></head><body>
+  <div class='content'>${html}</div>
+  </body></html>`);
+  doc.close();
+  win.focus();
+  win.print();
+}

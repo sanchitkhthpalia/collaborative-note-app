@@ -19,6 +19,9 @@ export default function ThemeToggle() {
     const initial = getInitialTheme();
     setTheme(initial);
     document.documentElement.classList.toggle("dark", initial === "dark");
+    const handler = () => toggleTheme();
+    window.addEventListener("toggle-theme", handler as EventListener);
+    return () => window.removeEventListener("toggle-theme", handler as EventListener);
   }, []);
 
   const toggleTheme = () => {
