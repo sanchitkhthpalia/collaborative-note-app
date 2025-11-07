@@ -8,13 +8,13 @@ import { Button } from "@nextui-org/react";
 
 interface RichTextEditorProps {
   content: string;
-  onChange: (content: string) => void;
+  onContentChangeAction: (content: string) => void;
   placeholder?: string;
 }
 
 export default function RichTextEditor({
   content,
-  onChange,
+  onContentChangeAction,
   placeholder = "Start writing...",
 }: RichTextEditorProps) {
   const editor = useEditor({
@@ -30,7 +30,7 @@ export default function RichTextEditor({
     ],
     content,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      onContentChangeAction(editor.getHTML());
     },
   });
 
@@ -46,9 +46,9 @@ export default function RichTextEditor({
   }
 
   return (
-    <div className="border border-gray-300 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
+    <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden bg-white dark:bg-gray-800 shadow-sm">
       {/* Toolbar */}
-      <div className="border-b border-gray-300 bg-gray-50 dark:bg-gray-900 p-2 flex flex-wrap gap-1">
+      <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-900 p-2 md:p-3 flex flex-wrap items-center gap-1.5">
         <Button
           size="sm"
           variant={editor.isActive("bold") ? "solid" : "ghost"}
@@ -73,7 +73,7 @@ export default function RichTextEditor({
         >
           <span className="line-through">S</span>
         </Button>
-        <div className="w-px h-6 bg-gray-300 mx-1" />
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1" />
         <Button
           size="sm"
           variant={editor.isActive("heading", { level: 1 }) ? "solid" : "ghost"}
@@ -98,7 +98,7 @@ export default function RichTextEditor({
         >
           <span className="font-bold">H3</span>
         </Button>
-        <div className="w-px h-6 bg-gray-300 mx-1" />
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1" />
         <Button
           size="sm"
           variant={editor.isActive("bulletList") ? "solid" : "ghost"}
@@ -115,7 +115,7 @@ export default function RichTextEditor({
         >
           <span>1. List</span>
         </Button>
-        <div className="w-px h-6 bg-gray-300 mx-1" />
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1" />
         <Button
           size="sm"
           variant={editor.isActive("codeBlock") ? "solid" : "ghost"}
@@ -135,7 +135,7 @@ export default function RichTextEditor({
       </div>
 
       {/* Editor Content */}
-      <div className="p-4">
+      <div className="p-4 md:p-5">
         <EditorContent editor={editor} />
       </div>
     </div>

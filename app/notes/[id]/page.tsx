@@ -112,7 +112,6 @@ export default function NoteEditorPage() {
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <Button variant="light" onPress={() => router.push("/")}>
             ← Back to Notes
@@ -132,8 +131,7 @@ export default function NoteEditorPage() {
           </div>
         </div>
 
-        {/* Note Editor */}
-        <Card className="p-6">
+        <Card className="p-6 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm rounded-xl">
           <div className="mb-4">
             <Input
               value={title}
@@ -147,22 +145,19 @@ export default function NoteEditorPage() {
             />
           </div>
           <Divider className="my-4" />
-          <RichTextEditor content={content} onChange={setContent} placeholder="Start typing..." />
+          <RichTextEditor content={content} onContentChangeAction={setContent} placeholder="Start typing..." />
         </Card>
 
-        {/* Footer info */}
         <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
           Last updated: {formatTimestamp(currentNote.updatedAt)}
         </div>
       </div>
 
-      {/* Version History Modal */}
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl" scrollBehavior="inside">
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">Version History</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
-              {/* Current version */}
               <Card className="border-2 border-blue-500">
                 <CardBody>
                   <div className="flex justify-between items-start mb-2">
@@ -175,7 +170,6 @@ export default function NoteEditorPage() {
                 </CardBody>
               </Card>
 
-              {/* Previous versions */}
               {versions.length === 0 ? (
                 <p className="text-center text-gray-500 dark:text-gray-400 py-8">
                   No previous versions available
