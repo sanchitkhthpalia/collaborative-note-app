@@ -113,14 +113,14 @@ export default function NoteEditorPage() {
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6 flex items-center justify-between gap-3">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-3">
             <Button variant="light" onPress={() => router.push("/")}>
               ← Back to Notes
             </Button>
             <PresenceIndicator noteId={noteId} />
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 sm:justify-end">
             <Button variant="light" onPress={onOpen}>
               History
               {versions.length > 0 && (
