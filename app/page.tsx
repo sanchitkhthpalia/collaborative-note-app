@@ -9,6 +9,7 @@ import { formatTimestamp } from "@/utils/formatTime";
 import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
 import NoteCard from "@/components/NoteCard";
+import StatsBar from "@/components/StatsBar";
 
 export default function Home() {
   const router = useRouter();
@@ -51,6 +52,8 @@ export default function Home() {
           className="mb-8"
         />
 
+        <StatsBar />
+
         {notes.length === 0 ? (
           <EmptyState
             icon={<span>📝</span>}
@@ -64,7 +67,10 @@ export default function Home() {
           />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {notes.map((note) => (
+            {notes
+              .slice()
+              .sort((a, b) => (Number(!!b.pinned) - Number(!!a.pinned)) || b.updatedAt - a.updatedAt)
+              .map((note) => (
               <NoteCard
                 key={note.id}
                 id={note.id}
@@ -72,7 +78,8 @@ export default function Home() {
                 content={note.content}
                 updatedAt={note.updatedAt}
                 versionsCount={note.versions.length}
-                onPress={handleNoteClick}
+                pinned={note.pinned}
+                onPressAction={handleNoteClick}
               />
             ))}
           </div>

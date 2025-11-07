@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Button } from "@nextui-org/react";
 import ThemeToggle from "./ThemeToggle";
+import CommandPalette from "./CommandPalette";
 
 export default function Navbar() {
   return (
@@ -24,6 +25,8 @@ export default function Navbar() {
             </Link>
           </div>
         </div>
+        {/* Command Palette mount */}
+        <CommandPalette />
       </div>
     </nav>
   );

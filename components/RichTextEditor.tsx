@@ -3,7 +3,7 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@nextui-org/react";
 
 interface RichTextEditorProps {
@@ -17,6 +17,8 @@ export default function RichTextEditor({
   onContentChangeAction,
   placeholder = "Start writing...",
 }: RichTextEditorProps) {
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef<any>(null);
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -44,6 +46,50 @@ export default function RichTextEditor({
   if (!editor) {
     return null;
   }
+
+  const ensureRecognition = () => {
+    if (typeof window === "undefined") return null;
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) return null;
+    if (!recognitionRef.current) {
+      const rec = new SR();
+      rec.lang = "en-US";
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.onresult = (e: any) => {
+        let finalText = "";
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const res = e.results[i];
+          if (res.isFinal) finalText += res[0].transcript;
+        }
+        if (finalText) {
+          editor.chain().focus().insertContent(finalText + " ").run();
+        }
+      };
+      rec.onend = () => setIsRecording(false);
+      recognitionRef.current = rec;
+    }
+    return recognitionRef.current;
+  };
+
+  const toggleRecord = () => {
+    const rec = ensureRecognition();
+    if (!rec) {
+      alert("Voice input not supported in this browser.");
+      return;
+    }
+    if (isRecording) {
+      rec.stop();
+      setIsRecording(false);
+    } else {
+      try {
+        rec.start();
+        setIsRecording(true);
+      } catch {
+        /* noop */
+      }
+    }
+  };
 
   return (
     <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden bg-white dark:bg-gray-800 shadow-sm">
@@ -131,6 +177,16 @@ export default function RichTextEditor({
           className="min-w-8"
         >
           <span>&quot;</span>
+        </Button>
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1" />
+        <Button
+          size="sm"
+          variant={isRecording ? "solid" : "ghost"}
+          color={isRecording ? "danger" : "default"}
+          onPress={toggleRecord}
+          className="min-w-8"
+        >
+          <span>{isRecording ? "⏹️" : "🎙️"}</span>
         </Button>
       </div>
 
