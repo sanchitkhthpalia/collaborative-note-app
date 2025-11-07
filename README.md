@@ -15,9 +15,15 @@ A modern, production-ready collaborative note-taking web application built with 
 
 ### UI/UX
 - ✅ **Modern Design**: Minimalistic interface using NextUI components
-- ✅ **Dark Mode Support**: Automatic dark mode based on system preferences
+- ✅ **Dark Mode Support**: Theme toggle with persistence (light/dark)
 - ✅ **Smooth Animations**: Transitions and hover effects for better UX
 - ✅ **Performance Optimized**: Lazy loading, memoization, and efficient state management
+- ✅ **Command Palette (Ctrl/Cmd+K)**: Search notes and run quick actions (Create Note, Toggle Theme)
+- ✅ **Pinned Notes**: Pin/bookmark important notes; pinned appear first
+- ✅ **Stats Bar**: Animated counters for Total Notes, Total Words, and Version Count
+- ✅ **Presence Indicator**: See viewers on a note (local, cross‑tab heartbeat)
+- ✅ **Export**: One‑click export to Markdown (.md) and PDF
+- ✅ **Voice Notes (Beta)**: Dictate directly into the editor using the Web Speech API
 
 ### Technical Features
 - ✅ **TypeScript**: Full type safety throughout the application
@@ -73,8 +79,15 @@ BLOQ_QUANTUM/
 │       └── [id]/
 │           └── page.tsx   # Note editor page
 ├── components/            # Reusable UI components
-│   ├── Navbar.tsx        # Navigation bar
-│   └── RichTextEditor.tsx # TipTap rich text editor
+│   ├── Navbar.tsx           # Navigation bar (Theme toggle + Command Palette mount)
+│   ├── ThemeToggle.tsx      # Light/Dark toggle with persistence
+│   ├── CommandPalette.tsx   # Ctrl/Cmd+K palette for search and actions
+│   ├── StatsBar.tsx         # Animated counters (notes/words/versions)
+│   ├── PresenceIndicator.tsx# Real-time viewers indicator
+│   ├── PageHeader.tsx       # Reusable page header
+│   ├── EmptyState.tsx       # Reusable empty state
+│   ├── NoteCard.tsx         # Note list card with pin control
+│   └── RichTextEditor.tsx   # TipTap editor (with Voice Notes button)
 ├── store/                # State management
 │   └── noteStore.ts      # Zustand store for notes
 ├── utils/                # Utility functions
@@ -103,12 +116,17 @@ Real-time collaboration is simulated using:
 - **Custom Events** for same-tab updates
 - Automatic version creation every 5 minutes
 
+### Presence Indicator (How it works)
+- Each note page writes a periodic heartbeat to localStorage.
+- Tabs viewing the same note aggregate heartbeats and display a live viewer count.
+
 ### Rich Text Editor
 **TipTap** provides a headless editor with:
 - Extensible plugin system
 - Markdown shortcuts
 - Collaborative editing ready (can be extended with WebSockets)
 - Full formatting support
+ - Voice dictation button (🎙️) using the browser’s Web Speech API
 
 ### UI Components
 **NextUI** provides:
@@ -128,6 +146,29 @@ Real-time collaboration is simulated using:
    - Title at the time
    - Precise timestamp
    - Unique version ID
+
+### Export (Markdown/PDF)
+- Open any note and click Export .md or Export PDF in the header.
+- Markdown: client-side HTML → Markdown conversion.
+- PDF: opens a print-styled tab and uses the browser’s Print to PDF.
+
+### Command Palette
+- Press Ctrl/Cmd+K.
+- Search notes by title/content.
+- Quick actions: Create Note, Toggle Theme.
+
+### Pin/Bookmark Notes
+- Click the 📌 on a note card.
+- Pinned notes are sorted to the top of the grid.
+
+### Stats Bar
+- Visible on Home above the notes grid.
+- Animated totals for notes, words, and version count.
+
+### Voice Notes (Beta)
+- Toolbar button: 🎙️ to start/stop.
+- Requires a browser with Web Speech API (Chrome/Edge).
+- If unsupported, a friendly fallback message appears.
 
 ### Collaboration Simulation
 1. Open the app in multiple browser tabs
@@ -165,8 +206,7 @@ NEXT_PUBLIC_WS_URL=wss://ws.example.com
 - [ ] Real WebSocket collaboration
 - [ ] User authentication
 - [ ] Shared notes with permissions
-- [ ] Export to PDF/Markdown
-- [ ] Search functionality
+- [ ] Global search with filters and tags
 - [ ] Tags and categories
 - [ ] Mobile app (React Native)
 
@@ -183,6 +223,7 @@ NEXT_PUBLIC_WS_URL=wss://ws.example.com
 | **TipTap** | Rich text editing |
 | **localStorage** | Data persistence |
 | **Framer Motion** | Animations (via NextUI) |
+| **Web Speech API** | Voice dictation |
 
 ## 📝 License
 

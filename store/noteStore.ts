@@ -15,6 +15,7 @@ export interface Note {
   createdAt: number;
   updatedAt: number;
   versions: NoteVersion[];
+  pinned?: boolean;
 }
 
 interface NoteStore {
@@ -31,6 +32,7 @@ interface NoteStore {
   deleteNote: (id: string) => void;
   setCurrentNote: (id: string | null) => void;
   getNoteById: (id: string) => Note | undefined;
+  togglePin: (id: string) => void;
 
   // Version history
   addVersion: (noteId: string, content: string, title: string) => void;
@@ -108,6 +110,7 @@ export const useNoteStore = create<NoteStore>()(
           createdAt: Date.now(),
           updatedAt: Date.now(),
           versions: [],
+          pinned: false,
         };
 
         set((state) => ({
@@ -189,6 +192,19 @@ export const useNoteStore = create<NoteStore>()(
 
       getNoteById: (id: string) => {
         return get().notes.find((note) => note.id === id);
+      },
+
+      togglePin: (id: string) => {
+        set((state) => ({
+          notes: state.notes.map((n) => (n.id === id ? { ...n, pinned: !n.pinned } : n)),
+          currentNote: state.currentNote && state.currentNote.id === id
+            ? { ...state.currentNote, pinned: !state.currentNote.pinned }
+            : state.currentNote,
+        }));
+
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent(STORAGE_EVENT_KEY));
+        }
       },
 
       addVersion: (noteId: string, content: string, title: string) => {
