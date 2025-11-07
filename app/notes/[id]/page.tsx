@@ -243,7 +243,7 @@ function htmlToMarkdown(html: string): string {
   s = s.replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, (m, p1) => p1.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, "- $1\n") + "\n");
   s = s.replace(/<ol[^>]*>([\s\S]*?)<\/ol>/gi, (m, p1) => {
     let i = 1;
-    return p1.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, (_, item) => `${i++}. ${item}\n`) + "\n";
+    return p1.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, (_match: string, item: string) => `${i++}. ${item}\n`) + "\n";
   });
   s = s.replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi, (m, p1) => p1.split(/\n/).map((l: string) => "> " + l).join("\n") + "\n\n");
   s = s.replace(/<br\s*\/?>(\s*)/gi, "\n");
