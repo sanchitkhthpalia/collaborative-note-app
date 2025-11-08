@@ -240,6 +240,6 @@ This project is part of the BLOQ QUANTUM assignment.
 
 ## 🤝 Contributing
 
-This is an assignment project. For personal use or learning, feel free to fork and modify!
+This is an assignment project. For personal use or learning,feel free to fork and modify!
 
 ---
