@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useNoteStore } from "@/store/noteStore";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Button, Card, CardBody, CardHeader, Spinner } from "@nextui-org/react";
 import Navbar from "@/components/Navbar";
 import { formatTimestamp } from "@/utils/formatTime";
@@ -14,9 +15,10 @@ import StatsBar from "@/components/StatsBar";
 export default function Home() {
   const router = useRouter();
   const { notes, isLoaded } = useNoteStore();
+  const { orgId } = useCurrentUser();
 
   const handleCreateNote = () => {
-    const newNote = useNoteStore.getState().createNote();
+    const newNote = useNoteStore.getState().createNote(orgId);
     router.push(`/notes/${newNote.id}`);
   };
 
@@ -54,7 +56,7 @@ export default function Home() {
 
         <StatsBar />
 
-        {notes.length === 0 ? (
+        {notes.filter((n) => n.orgId === orgId).length === 0 ? (
           <EmptyState
             icon={<span>📝</span>}
             title="No notes yet"
@@ -68,6 +70,7 @@ export default function Home() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {notes
+              .filter((n) => n.orgId === orgId)
               .slice()
               .sort((a, b) => (Number(!!b.pinned) - Number(!!a.pinned)) || b.updatedAt - a.updatedAt)
               .map((note) => (

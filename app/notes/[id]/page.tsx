@@ -18,16 +18,18 @@ import {
   Divider,
 } from "@nextui-org/react";
 import Navbar from "@/components/Navbar";
-import RichTextEditor from "@/components/RichTextEditor";
+import LiveEditor from "@/components/LiveEditor";
 import { formatTimestamp, getFullDateTime } from "@/utils/formatTime";
 import { extractTitle } from "@/utils/extractTitle";
 import { debounce } from "@/utils/debounce";
 import PresenceIndicator from "@/components/PresenceIndicator";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 export default function NoteEditorPage() {
   const router = useRouter();
   const params = useParams();
   const noteId = params.id as string;
+  const { orgId } = useCurrentUser();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { currentNote, isLoaded, getNoteById, updateNote, deleteNote, restoreVersion, getVersions, setCurrentNote } =
@@ -49,6 +51,12 @@ export default function NoteEditorPage() {
 
     const note = getNoteById(noteId);
     if (!note) {
+      router.push("/");
+      return;
+    }
+
+    // org guard: block access if not same org
+    if (note.orgId && orgId && note.orgId !== orgId) {
       router.push("/");
       return;
     }
@@ -155,7 +163,7 @@ export default function NoteEditorPage() {
             />
           </div>
           <Divider className="my-4" />
-          <RichTextEditor content={content} onContentChangeAction={setContent} placeholder="Start typing..." />
+          <LiveEditor noteId={noteId} orgId={orgId || "org-alpha"} content={content} onLocalChangeAction={setContent} />
         </Card>
 
         <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">

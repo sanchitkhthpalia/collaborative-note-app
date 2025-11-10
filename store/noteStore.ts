@@ -6,6 +6,7 @@ export interface NoteVersion {
   content: string;
   timestamp: number;
   title: string;
+  orgId?: string;
 }
 
 export interface Note {
@@ -16,6 +17,7 @@ export interface Note {
   updatedAt: number;
   versions: NoteVersion[];
   pinned?: boolean;
+  orgId?: string;
 }
 
 interface NoteStore {
@@ -27,7 +29,7 @@ interface NoteStore {
   initializeStore: () => void;
 
   // Note CRUD operations
-  createNote: () => Note;
+  createNote: (orgId?: string) => Note;
   updateNote: (id: string, content: string, title?: string) => void;
   deleteNote: (id: string) => void;
   setCurrentNote: (id: string | null) => void;
@@ -102,7 +104,7 @@ export const useNoteStore = create<NoteStore>()(
         set({ isLoaded: true });
       },
 
-      createNote: () => {
+      createNote: (orgId?: string) => {
         const newNote: Note = {
           id: `note-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           title: "Untitled Note",
@@ -111,6 +113,7 @@ export const useNoteStore = create<NoteStore>()(
           updatedAt: Date.now(),
           versions: [],
           pinned: false,
+          orgId,
         };
 
         set((state) => ({
@@ -149,6 +152,7 @@ export const useNoteStore = create<NoteStore>()(
                     content: note.content,
                     title: note.title,
                     timestamp: note.updatedAt,
+                    orgId: note.orgId,
                   },
                   ...note.versions,
                 ];
@@ -216,6 +220,7 @@ export const useNoteStore = create<NoteStore>()(
                 content,
                 title,
                 timestamp: Date.now(),
+                orgId: note.orgId,
               };
               return {
                 ...note,
@@ -265,6 +270,10 @@ export const useNoteStore = create<NoteStore>()(
       getVersions: (noteId: string) => {
         const note = get().notes.find((n) => n.id === noteId);
         return note?.versions || [];
+      },
+
+      getNotesForOrg: (orgId: string) => {
+        return get().notes.filter((n) => n.orgId === orgId);
       },
     }),
     {

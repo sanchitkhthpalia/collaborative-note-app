@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "collab-server": "file:.."
+  }
+}
