@@ -8,7 +8,7 @@ A modern, production-ready collaborative note-taking web application built with 
 - ✅ **Rich Text Editing**: Full-featured editor with TipTap including bold, italic, headings, lists, code blocks, and more
 - ✅ **Notes Management**: Create, edit, and delete notes with a clean, intuitive interface
 - ✅ **Version History**: Automatic version tracking with timestamps for each note
-- ✅ **Version Restoration**: One-click restoration to any previous version
+- ✅ **Version Restoration**: One-click restoration to any previous versionn
 - ✅ **Real-time Collaboration Simulation**: Changes sync across browser tabs using localStorage
 - ✅ **Responsive Design**: Beautiful, modern UI that works on all devices
 - ✅ **Auto-save**: Debounced auto-save functionality for smooth user experience
